@@ -107,6 +107,6 @@ Goto the `docker-examples/` folder, and run the example with
    
     $ docker compose -f docker-compose.pmwiki.adv.yml  up --build
 
-then open browser on `https://localhost:944
+then open browser on `https://localhost:9443/`
 
 The behavior for `sp/pmwiki.adv` is the same as for `sp/pmwiki.basic` except that nicer urls are shown for the wiki pages.
