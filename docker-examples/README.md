@@ -6,8 +6,8 @@ This directory contains 3 examples of an identity provider and a service provide
 Short description examples: a SimpleSAMLphp identity provider in `idp`/ with as service provider:
 
 1.  a simple index.php script at [`sp/simple_php_website/`](#spsimple_php_website) 
-2.  a basic pmwiki installation  at [`sp/pmwiki.basic/`](#sppmwiki.basic)    
-3.  an advanced pmwiki installation at [`sp/pmwiki.adv/`](#sppmwiki.adv)<br> Compared to the basic pmwiki installation the advanced pmwiki installation does more:   
+2.  a basic pmwiki installation  at [`sp/pmwiki.basic/`](#sppmwikibasic)    
+3.  an advanced pmwiki installation at [`sp/pmwiki.adv/`](#sppmwikiadv)<br> Compared to the basic pmwiki installation the advanced pmwiki installation does more:   
      * extensive use of .htaccess redirects
      
         - cleanurls with .htaccess
