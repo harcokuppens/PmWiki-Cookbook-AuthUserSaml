@@ -1,0 +1,321 @@
+
+below is a summary of
+
+ * https://simplesamlphp.org/docs/stable/simplesamlphp-sp.html
+    (exported to pdf:  SimpleSAMLphp_Service_Provider_QuickStart.pdf)
+ * https://simplesamlphp.org/docs/stable/simplesamlphp-idp.html    
+    (exported to pdf: SimpleSAMLphp_Identity_Provider_QuickStart.pdf)   
+      
+      
+SHORT overview 
+---------------
+
+SHORT setup IdP  
+   1 Configuring the IdP 
+         enable idp mode and basic_auth_module in software and configure salt/email        => config/config.php  
+         and authentication                                                                => config/authsources.php
+         Configuring the IdP's metadata  (certificate/authsource/attributes.NameFormat)    => metadata/saml20-idp-hosted.php
+   2 exchange metadata with IdP
+     a) Adding SPs to the IdP.             => metadata/saml20-sp-remote.php
+     b) Adding this IdP to other SPs => see setup SP 2a)      
+
+  => if you skip step 2 (no sp setup) then you can still test the authentication module :
+     using the idp server itself
+       
+        Click the "Authentication" tab => click the link "Test configured authentication sources" =>  click the link "userpass" 
+        and login with one of the test credentials.
+    
+      
+SHORT setup SP: 
+  1 Configuring the SP 
+      enable sp mode in software and configure certificate and default idp   => config/authsources.php
+  2 exchange metadata with IdP
+     a) Adding IdPs to the SP           metadata/saml20-idp-remote.php
+     b) Adding this SP to other IdPs  => see setup IdP 2a)
+             
+   
+
+
+============================================================================================
+
+SimpleSAMLphp Service Provider QuickStart
+-----------------------------------------
+src: https://simplesamlphp.org/docs/latest/simplesamlphp-sp.html
+      or 
+     SimpleSAMLphp_Service_Provider_QuickStart.pdf
+      
+1. Configuring the SP => config/authsources.php
+
+  The SP is configured by an entry in config/authsources.php .
+
+  This is a minimal authsources.php for a SP:
+
+    <?php
+    $config = [
+
+        /* This is the name of this authentication source, and will be used to access it later. */
+        'default-sp' => [
+            'saml:SP',
+        ],
+    ];
+  
+  
+  If you want multiple Service Providers in the same site and installation, you can add more entries in the authsources.php configuration. 
+  If so remember to set the EntityID explicitly. Here is an example:
+
+      'sp1' => [
+          'saml:SP',
+        'entityID' => 'https://sp1.example.org/',
+      ],
+      'sp2' => [
+          'saml:SP',
+        'entityID' => 'https://sp2.example.org/',
+      ],
+ 
+2. OPTIONAL: Enabling a certificate for your Service Provider   => authsources.php 
+
+   Some Identity Providers / Federations may require that your Service Providers holds a certificate. If you enable a certificate for your Service Provider, it may be
+   able to sign requests and response sent to the Identity Provider, as well as receiving encrypted responses.
+
+   Create a self-signed certificate in the cert/ directory:
+
+        cd cert
+        openssl req -newkey rsa:3072 -new -x509 -days 3652 -nodes -out saml.crt -keyout saml.pem
+
+    Then edit your authsources.php entry, and add references to your certificate:
+
+    'default-sp' => [
+        'saml:SP',
+        'privatekey' => 'saml.pem',
+        'certificate' => 'saml.crt',
+    ],
+  
+
+3. Adding IdPs to the SP   => metadata/saml20-idp-remote.php
+
+  
+  The service provider you are configuring needs to know about the identity providers you are going to connect to it. This is configured by metadata stored in
+  metadata/saml20-idp-remote.php . This is a minimal example of a metadata/saml20-idp-remote.php metadata file:
+
+    <?php
+    $metadata['https://example.com'] = [
+        'SingleSignOnService'  => 'https://example.com/simplesaml/saml2/idp/SSOService.php',
+        'SingleLogoutService'  => 'https://example.com/simplesaml/saml2/idp/SingleLogoutService.php',
+        'certificate'          => 'example.pem',
+    ];
+  example.pem under your cert/ directory contains the certificate the identity provider uses for signing assertions.
+  
+  
+4. Setting the default IdP  => config/authsources.php
+
+  An option in the authentication source allows you to configure which IdP should be used. This is the idp option.
+  
+    <?php
+    $config = [
+
+        'default-sp' => [
+            'saml:SP',
+
+            /*
+             * The entity ID of the IdP this should SP should contact.
+             * Can be NULL/unset, in which case the user will be shown a list of available IdPs.
+             */
+            'idp' => 'https://idp.example.com',             # note for idp added in step 3 the value should be 'https://example.com'
+        ],
+    ];
+    
+    
+5. Exchange metadata with the IdP
+
+ a) send the metadata of your SP to the IdP
+ 
+ b) add the metadata of the IdP to your SP         => done in step 3. above
+      into the metadata/saml20-idp-remote.php
+      
+ 
+TEST) Test the SP
+
+   After the metadata is configured on the IdP, you should be able to test the configuration. The admin module of SimpleSAMLphp has a tab to test authentication
+   sources. There you should a list of authentication sources, including the one you have created for the SP.
+
+   After you click the link for that authentication source, you will be redirected to the IdP. After entering your credentials, you should be redirected back to the
+   test page. The test page should contain a list of your attributes:
+
+
+
+SHORT: quick setup SP (which basicly is an interface to authsource (idp))
+
+  config sp  => config/authsources.php
+  
+          <?php
+          $config = [
+
+              'default-sp' => [
+                  'saml:SP',
+
+                   /* OPTIONAL
+                      enable a certificate for your Service Provider, it may be
+                      able to sign requests and response sent to the Identity Provider, 
+                      as well as receiving encrypted responses from the Identity Provider.
+                   /* 
+                  'privatekey' => 'saml.pem',
+                  'certificate' => 'saml.crt',
+          
+                  /*
+                   * The entity ID of the IdP this should SP should contact.
+                   * Can be NULL/unset, in which case the user will be shown a list of available IdPs.
+                   */
+                  'idp' => 'https://idp.example.com',             # note for idp added in step 3 the value should be 'https://example.com'
+              ],
+          ];  
+ 
+ 
+ exchange metadata with IdP          
+          
+  Adding IdPs to the SP   => metadata/saml20-idp-remote.php
+
+  
+      The service provider you are configuring needs to know about the identity providers you are going to connect to it. This is configured by metadata stored in
+      metadata/saml20-idp-remote.php . This is a minimal example of a metadata/saml20-idp-remote.php metadata file:
+
+        <?php
+        $metadata['https://example.com'] = [
+            'SingleSignOnService'  => 'https://example.com/simplesaml/saml2/idp/SSOService.php',
+            'SingleLogoutService'  => 'https://example.com/simplesaml/saml2/idp/SingleLogoutService.php',
+            'certificate'          => 'example.pem',
+        ];
+    
+      example.pem under your cert/ directory contains the certificate the identity provider uses for signing assertions.
+                    
+  Send the metadata of your SP to the IdP          
+  
+       The metadata of your SP can be found in the Federation tab of the web interface. Copy the SAML 2.0 XML Metadata document automatically generated by
+       SimpleSAMLphp and send it to the administrator of the IdP.
+             
+             
+
+SHORT setup SP: 
+  1 Configuring the SP 
+      enable sp mode in software and configure certificate and default idp   => config/authsources.php
+  2 exchange metadata with IdP
+     a) Adding IdPs to the SP           metadata/saml20-idp-remote.php
+     b) Adding this SP to other IdPs  => see setup IdP 2a)
+             
+
+                
+SimpleSAMLphp Identity Provider QuickStart
+-------------------------------------------           
+src: https://simplesamlphp.org/docs/latest/simplesamlphp-idp.html    
+      or SimpleSAMLphp_Identity_Provider_QuickStart.pdf         
+             
+configure Idp =>  config/config.php             
+   
+   The option enable.saml20-idp controls whether SAML 2.0 IdP support is enabled. Enable it by assigning true to them:
+
+     'enable.saml20-idp' => true,
+    
+  The exampleauth:UserPass authentication module is part of the exampleauth module. This module isn't enabled by default, so you will have to enable it in config.php 
+
+      'module.enable' => [
+           'exampleauth' => true,
+           …
+      ],
+
+
+Configuring the IdP's metadata => metadata/saml20-idp-hosted.php
+
+    The SAML 2.0 IdP is configured by the metadata stored in metadata/saml20-idp-hosted.php . This is a minimal configuration:
+
+      <?php
+      $metadata['__DYNAMIC:1__'] = [
+          /*
+           * The hostname for this IdP. This makes it possible to run multiple
+           * IdPs from the same configuration. '__DEFAULT__' means that this one
+           * should be used by default.
+           */
+          'host' => '__DEFAULT__',
+
+          /*
+           * The private key and certificate to use when signing responses.
+           * These are stored in the cert-directory.
+           */
+          'privatekey' => 'example.org.pem',
+          'certificate' => 'example.org.crt',
+
+          /*
+           * The authentication source which should be used to authenticate the
+           * user. This must match one of the entries in config/authsources.php.
+           */
+          'auth' => 'example-userpass',
+          
+          /*
+           *   attributes should be delivered using the urn:oasis:names:tc:SAML:2.0:attrname-format:uri NameFormat
+           */       
+          'attributes.NameFormat' => 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri',
+          'authproc' => [
+              // Convert LDAP names to oids.
+              100 => ['class' => 'core:AttributeMap', 'name2oid'],
+          ],
+          
+      ];
+  
+    For more information about available options in the idp-hosted metadata files, see the IdP hosted reference .
+
+
+  
+Configuration for authentication  =>  config/authsources.php .
+
+  In this setup, this file should contain a single entry:
+
+  <?php
+  $config = [
+    'example-userpass' => [
+      'exampleauth:UserPass',
+      'student:studentpass' => [
+        'uid' => ['student'],
+        'eduPersonAffiliation' => ['member', 'student'],
+      ],
+      'employee:employeepass' => [
+        'uid' => ['employee'],
+        'eduPersonAffiliation' => ['member', 'employee'],
+      ],
+    ],
+  ];
+ 
+  This configuration creates two users - student and employee , with the passwords studentpass and employeepass . The username and password are stored in the array index ( student:studentpass for the student -user). The attributes for each user are configured in the array referenced by the index.
+       
+       
+exchange metadata with IdP 
+
+    Adding SPs to the IdP.  => metadata/saml20-sp-remote.php
+    
+       The identity provider you are configuring needs to know about the service providers you are going to connect to it. This is configured by metadata stored in
+       metadata/saml20-sp-remote.php . This is a minimal example of a metadata/saml20-sp-remote.php metadata file for a SimpleSAMLphp SP:
+
+          <?php
+          $metadata['https://sp.example.org/simplesaml/module.php/saml/sp/metadata.php/default-sp'] = [
+              'AssertionConsumerService' => 'https://sp.example.org/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp',
+              'SingleLogoutService'      => 'https://sp.example.org/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp',
+          ];
+   
+       Note that the URI in the entityID and the URLs to the AssertionConsumerService and SingleLogoutService endpoints change between different service providers. If
+       you have the metadata of the remote SP as an XML file, you can use the built-in XML to SimpleSAMLphp metadata converter, which by default is available as
+       /admin/metadata-converter.php in your SimpleSAMLphp installation.
+
+       For more information about available options in the sp-remote metadata files, see the SP remote reference .
+
+    Adding this IdP to other SPs
+     
+       The method for adding this IdP to a SP varies between different types of SPs. In general, most SPs need some metadata from the IdP. This should be available
+       from /saml2/idp/metadata.php .
+
+
+   
+SHORT setup IdP  
+   1 Configuring the IdP 
+         enable idp mode and basic_auth_module in software and configure salt/email        => config/config.php  
+         and authentication                                                                => config/authsources.php
+         Configuring the IdP's metadata  (certificate/authsource/attributes.NameFormat)    => metadata/saml20-idp-hosted.php
+   2 exchange metadata with IdP
+     a) Adding SPs to the IdP.             => metadata/saml20-sp-remote.php
+     b) Adding this IdP to other SPs => see setup SP 2a)   

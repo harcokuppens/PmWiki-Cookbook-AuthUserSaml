@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  idp:
+    build: idp/
+    ports:
+      - "8443:443"
+  sp:
+    build: sp/simple_php_website/
+    ports:
+      - "9443:443"

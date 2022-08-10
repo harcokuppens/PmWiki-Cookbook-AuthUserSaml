@@ -1,0 +1,17 @@
+(:Summary:Contains the '[[PmWiki/AvailableActions|action]]' links (like Browse, Edit, History, etc.), placed at the top of the page, see [[PmWiki/site page actions]]:)
+(:comment This page can be somewhat complex to figure out the first time you see it. Its contents are documented at PmWiki.SitePageActions if you need help. :)
+* %item rel=nofollow class=browse    accesskey='$[ak_view]'%      [[{*$FullName}               | $[View] ]] {*$PageInDist}
+* %item rel=nofollow class=edit      accesskey='$[ak_edit]'%      [[{*$FullName}?action=edit   | $[Edit] ]]
+* %item rel=nofollow class=diff      accesskey='$[ak_history]'%   [[{*$FullName}?action=diff   | $[History] ]]
+(:if auth upload:)
+* %item rel=nofollow class=upload    accesskey='$[ak_attach]'%    [[{*$FullName}?action=upload | $[Attach] ]]
+(:ifend:)
+* %item rel=nofollow class=print     accesskey='$[ak_print]'%     [[{*$FullName}?action=print  | $[Print] ]]
+(:if group Site,SiteAdmin,Cookbook,Profiles,PmWiki*:) (:comment delete if and ifend to enable backlinks:)
+* %item rel=nofollow class=backlinks accesskey='$[ak_backlinks]'% [[{*$Name}?action=search&q=link={*$FullName} | $[Backlinks] ]]
+(:ifend:)
+(:if authid:)
+* %item rel=nofollow class=logout    accesskey="$[ak_logout]"%''  [-[[{*$FullName}?action=logout | $[Logout] {$AuthId} ]]-]''
+(:else:)
+* %item rel=nofollow class=login    accesskey="$[ak_login]"%''  [-[[{*$FullName}?action=login | $[Login] ]]-]''
+(:ifend:)

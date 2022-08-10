@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  idp:
+    build: idp/
+    ports:
+      - "8443:443"
+  pmwiki:
+    build:
+      context: sp/pmwiki.basic/
+      ## uncomment next lines to change params used in Dockerfile to build pmwiki image 
+      # args:
+      #   PMWIKI_VERSION: '2.3.6' # different version of pmwiki
+      #   PMWIKI_DIR: '/var/www/html/subdir/' # install pmwiki in subdir instead
+      #   SIMPLESAMLPHP_VERSION: '1.19.4' # different version of simplesamlphp
+      #   #SIMPLESAMLPHP_DIR: '/var/www/html/simplesamlphp' # also change this dir in $AuthUserSaml_SimpleSamlPhp_dir in config.php
+    ports:
+      - "9443:443"

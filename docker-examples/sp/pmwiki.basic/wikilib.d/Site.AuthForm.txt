@@ -1,0 +1,20 @@
+(:Summary:Form displayed when requesting a [[PmWiki/password(s)]] or username/password:)
+
+(:messages:)
+(:if enabled InvalidLogin:)* $[Name/password not recognized]
+(:ifend:)
+
+* '''with Saml authentication  server'''
+
+--> (:saml_loginbox:)
+
+
+* '''with PmWiki account'''
+
+--> (:input auth_form:)
+    (:if enabled EnableAuthUser:)$[Name]: (:input text name=authid:)\\
+    (:if:)$[Password]: (:input password name=authpw:)
+    (:input submit value='$[OK]':)
+    (:input end:)
+    (:ifend:)
+    
