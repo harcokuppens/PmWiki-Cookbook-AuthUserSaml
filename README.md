@@ -27,4 +27,4 @@ Detailed instructions are at [docker-examples/README.md](https://github.com/harc
 
 ## Installation
 
-For installing this extension read the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page.
+Instructions for installing this extension are at the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page.
