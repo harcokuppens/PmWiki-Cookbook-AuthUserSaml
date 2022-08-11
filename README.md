@@ -2,6 +2,12 @@
 
 SAML authentication extension for AuthUser in PmWiki.
 
+## Description
+
+Security Assertion Markup Language (SAML) is an open standard for exchanging authentication and authorization data between parties, in particular, between an identity provider and a service provider. See https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language for a more extensive explanation.
+
+This extension uses the SAML implementation library from SimpleSAMLphp (https://simplesamlphp.org) for integrating SAML authentication into AuthUser?. Look at the documentation about SimpleSAMLphp at https://simplesamlphp.org/docs and in particularly the SimpleSAMLphp Service Provider QuickStart page.
+
 ## Terminology
 
 * **[PmWiki](https://www.pmwiki.org)**  <br>
