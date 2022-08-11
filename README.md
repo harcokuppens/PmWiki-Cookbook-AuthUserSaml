@@ -1,3 +1,5 @@
+# AuthUserSaml PmWiki addon
+
 SAML authentication extension for AuthUser in PmWiki.
 
 ## Terminology
