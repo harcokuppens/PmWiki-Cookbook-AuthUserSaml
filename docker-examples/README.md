@@ -20,6 +20,7 @@ Short description examples: a SimpleSAMLphp identity provider in `idp`/ with as 
         - with pmwiki account login does also redirect on login page
         - disable password-only authentication 
 
+The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Provider_QuickStart.pdf and the `sp/simple_php_website/Dockerfile` follows the instruction in SimpleSAMLphp_Service_Provider_QuickStart.pdf. The pmwiki based `Dockerfile`'s are based on that `Dockerfile`.
 
 ## `sp/simple_php_website`
 
