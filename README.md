@@ -1,4 +1,4 @@
-# AuthUserSaml PmWiki addon
+# AuthUserSaml extension for PmWiki
 
 SAML authentication extension for AuthUser in PmWiki.
 
