@@ -8,6 +8,8 @@ Security Assertion Markup Language (SAML) is an open standard for exchanging aut
 
 This extension uses the SAML implementation library from SimpleSAMLphp (https://simplesamlphp.org) for integrating SAML authentication into PmWiki's identity-based authorization system named [AuthUser](https://www.pmwiki.org/wiki/Cookbook/AuthUser). For a more extensive explanation of SimpleSAMLphp look at the [SimpleSAMLphp documentation](https://simplesamlphp.org/docs) and in particularly the [SimpleSAMLphp Service Provider QuickStart page](https://simplesamlphp.org/docs/stable/simplesamlphp-sp.html).
 
+## Installation
+
 Instructions for installing this extension are at the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page.
 
 ## Terminology
@@ -31,6 +33,4 @@ the use of usernames and passwords.
 
 Take a look at these examples to better understand how it all works. Detailed instructions are at [docker-examples/README.md](https://github.com/harcokuppens/PmWiki-Cookbook-AuthUserSaml/blob/main/docker-examples/README.md).
 
-## Installation
 
-Instructions for installing this extension are at the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page.
