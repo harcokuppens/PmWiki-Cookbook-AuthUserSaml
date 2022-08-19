@@ -31,7 +31,10 @@ We have a single SimpleSAMLphp identity provider in `idp/`, which can be used wi
      
      The advanced pmwiki installation setup with Docker is more advanced so that we easily can launch with `docker compose` multiple independent instances of the  advanced pmwiki website to demonstrate **Single Login** and **Single Logout**. 
     
-The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Provider_QuickStart.pdf and the `sp/simple_php_website/Dockerfile` follows the instruction in SimpleSAMLphp_Service_Provider_QuickStart.pdf. The pmwiki based `Dockerfile`'s are based on that `Dockerfile`. Making the `Dockerfile` follow the original instructions makes it much clearer and more easy to adapt for newer versions.
+The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Provider_QuickStart.pdf and the `sp/simple_php_website/Dockerfile` follows the instruction in SimpleSAMLphp_Service_Provider_QuickStart.pdf. By making the `Dockerfile` follow the original instructions of the SimpleSamlPhp website makes it much clearer and more easy to adapt for newer versions. 
+
+The `Dockerfile`'s for the pmwiki examples are based on the `Dockerfile` of the `simple_php_website` example. The `Dockerfile` for the pmwiki example adds instructions for installing pmwiki and then installing the AuthUserSaml extension pmwiki.  Detailed instructions for installing the AuthUserSaml extension are at the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page. 
+
 
 ## `sp/simple_php_website`
 
