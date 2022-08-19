@@ -1,7 +1,10 @@
 version: "3.9"
 services:
   idp:
-    build: idp/
+    build:
+      context: idp/
+      args:
+        SP_PORTS: "9443" # space separated for easy processing
     ports:
       - "8443:443"
   sp:
