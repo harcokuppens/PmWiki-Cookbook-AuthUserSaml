@@ -2,8 +2,17 @@
   
 This directory contains 3 examples of an identity provider and a service provider setup using SimpleSAMLphp. Each example is run with docker compose to start both the identity provider and a service provider at once. One example demonstrates SAML with a simple php script, and the other two examples with pmwiki as service provider; once for a basic config, and the other with a more advanced config. Take a look at these examples to better understand how it all works. 
 
+## Docker examples
+ The ```docker-examples/``` directory contains 3 examples of an identity provider and a service provider setup using SimpleSAMLphp. Each example is run with docker compose to start both the identity provider and a service provider at once. One example demonstrates SAML with a simple php script, and the other two examples with pmwiki as service provider; once for a basic config, and the other with a more advanced config. The advanced PmWiki example is also used to show [Single SignOn(SSO)](https://en.wikipedia.org/wiki/Single_sign-on) and [Single Logout(SLO)](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/siteminder/12-7/configuring/partnership-federation/logging-out-of-user-sessions/single-logout-overview-saml-2-0.html) feature of SAML by using docker compose to start one instance of IDP and two separate instances of the PmWiki website:
 
-Short description examples: a SimpleSAMLphp identity provider in `idp`/ with as service provider:
+* [Single SignOn(SSO)](https://en.wikipedia.org/wiki/Single_sign-on) : if you login to one PmWiki website with your credentials, you can directly login to the other PmWiki website without needing to supply your credentials again.
+* [Single Logout(SLO)](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/siteminder/12-7/configuring/partnership-federation/logging-out-of-user-sessions/single-logout-overview-saml-2-0.html): if you logout from one PmWiki website you are directly logged out from the other PmWiki website. 
+* SSO and SLO only work within the same browser and not between different browsers.
+
+
+### Short description examples 
+
+We have a single SimpleSAMLphp identity provider in `idp/`, which can be used with one of our three example service providers:
 
 1.  a simple index.php script at [`sp/simple_php_website/`](#spsimple_php_website) 
 2.  a basic pmwiki installation  at [`sp/pmwiki.basic/`](#sppmwikibasic)    
