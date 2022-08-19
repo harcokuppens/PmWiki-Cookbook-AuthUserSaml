@@ -396,7 +396,7 @@ COPY <<'EOF' ${SIMPLESAMLPHP_DIR}/config/authsources.php
                                            // because otherwise you get error on SP: 
                                            //     Validation of received messages enabled, but no signature found on message.    
          
-         # OFFICIAL DOCS: from https://simplesamlphp.org/docs/1.19/saml/sp.html  (or per idp specific
+         # OFFICIAL DOCS: from https://simplesamlphp.org/docs/stable/saml/sp.html  (or per idp specific
          #                https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote.html#)
          #
          # assertion.encryption
