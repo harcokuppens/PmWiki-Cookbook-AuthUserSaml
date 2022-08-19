@@ -2,16 +2,31 @@ version: "3.9"
 services:
   idp:
     build: idp/
+    build:
+      context: idp/
+      args:
+        SP_PORTS: "7443 9443" # space separated for easy processing
     ports:
       - "8443:443"
-  pmwiki:
+  pmwiki1:
     build:
       context: sp/pmwiki.adv/
-      # # uncomment next lines to change params used in Dockerfile to build pmwiki image
-      # args:
-      #   PMWIKI_VERSION: '2.3.6' # different version of pmwiki
-      #   PMWIKI_DIR: '/var/www/html/' # install pmwiki in subdir
-      #   SIMPLESAMLPHP_VERSION: '1.19.4' # different version of simplesamlphp
-      #   #SIMPLESAMLPHP_DIR: '/var/www/html/simplesamlphp' # also change this dir in $AuthUserSaml_SimpleSamlPhp_dir in config.php
+      args:
+        PORT: "7443"
+        #PMWIKI_VERSION: '2.3.6' # different version of pmwiki
+        #PMWIKI_DIR: '/var/www/html/' # install pmwiki in subdir
+        #SIMPLESAMLPHP_VERSION: '1.19.4' # different version of simplesamlphp
+        ##SIMPLESAMLPHP_DIR: '/var/www/html/simplesamlphp' # also change this dir in $AuthUserSaml_SimpleSamlPhp_dir in config.php
+    ports:
+      - "7443:443"
+  pmwiki2:
+    build:
+      context: sp/pmwiki.adv/
+      args:
+        PORT: "9443"
+        #PMWIKI_VERSION: '2.3.6' # different version of pmwiki
+        #PMWIKI_DIR: '/var/www/html/' # install pmwiki in subdir
+        #SIMPLESAMLPHP_VERSION: '1.19.4' # different version of simplesamlphp
+        ##SIMPLESAMLPHP_DIR: '/var/www/html/simplesamlphp' # also change this dir in $AuthUserSaml_SimpleSamlPhp_dir in config.php
     ports:
       - "9443:443"

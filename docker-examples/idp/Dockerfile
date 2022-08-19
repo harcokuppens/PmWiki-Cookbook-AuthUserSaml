@@ -33,10 +33,15 @@
 # idea from https://github.com/kristophjunge/docker-test-saml-idp use env. variables to possibly override sp in idp
 # use ARG instead ENV because ARG works over multiple stages, and ENV only in on stage
 
+# specify ports for the sp's know for idp; specify the ports space separated for easy processing
+# by default only have one SP configure on port 9443:
+ARG SP_PORTS="9443"
+##example multiple sp: 
+#ARG SP_PORTS="9443 7443"
 
-ARG SIMPLESAMLPHP_SP_ENTITY_ID='https://localhost:9443/simplesaml/module.php/saml/sp/metadata.php/default-sp'
-ARG SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE='https://localhost:9443/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp'
-ARG SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE='https://localhost:9443/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp'
+ARG SIMPLESAMLPHP_SP_ENTITY_ID='https://localhost:$PORT/simplesaml/module.php/saml/sp/metadata.php/default-sp'
+ARG SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE='https://localhost:$PORT/simplesaml/module.php/saml/sp/saml2-acs.php/default-sp'
+ARG SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE='https://localhost:$PORT/simplesaml/module.php/saml/sp/saml2-logout.php/default-sp'
 
 
 ARG SIMPLESAMLPHP_VERSION='1.19.5'
@@ -68,7 +73,7 @@ FROM php:7.4-apache
 
 # for debugging we install
 #--------------------------
-RUN apt-get update && apt-get -y install vim less iproute2 iputils-ping
+RUN apt-get update && apt-get -y install vim less iproute2 iputils-ping gettext-base
 
 
 #  enable ssl
@@ -182,9 +187,8 @@ RUN mkdir /var/simplesamlphp && curl -s -L  https://github.com/simplesamlphp/sim
 # because then we keep using the same certificate when rebuilding image. 
 # Otherwise it will change per build, and you have to reaccept that selfsigned cert. in your browser.
 # So each website needs unique certificate so we create it outside of docker, and copy it into the image:
-COPY cert/idp.crt /var/simplesamlphp/cert/
-COPY cert/idp.pem /var/simplesamlphp/cert/
 
+COPY cert/* /var/simplesamlphp/cert/
 RUN chmod a+r /var/simplesamlphp/cert/*
 
 # config simplesamlphp
@@ -204,6 +208,11 @@ RUN sed -i "s|'auth.adminpassword' => '123',|'auth.adminpassword' => 'secret',|"
 RUN sed -i "s|'secretsalt' => 'defaultsecretsalt',|'secretsalt' => '678617yfg36mjqrr1hv5xv0txi59xmz5',|"  /var/simplesamlphp/config/config.php
 
 
+# # enable rememberme on ipd
+# RUN sed -i "s|'session.rememberme.enable' => false,|'session.rememberme.enable' => true,|" /var/simplesamlphp/config/config.php
+# RUN sed -i "s|'session.rememberme.checked' => false,|'session.rememberme.enable' => true,|" /var/simplesamlphp/config/config.php
+
+
 # Configure debugging
 # - enable saml debug messages
 RUN sed -i "s|'saml' => false,|'saml' => true,|"  /var/simplesamlphp/config/config.php
@@ -212,6 +221,24 @@ RUN sed -i "s|'saml' => false,|'saml' => true,|"  /var/simplesamlphp/config/conf
 # - send log messages to stderr  (docker uses stderr to show log messages) 
 RUN sed -i "s|'logging.handler' => 'syslog',|'logging.handler' => 'errorlog',|" /var/simplesamlphp/config/config.php
 
+# Prevent cookie conflicts by giving cookies unique names
+#   Give cookies different name to prevent conflicts with SP in a docker compose run.
+#   Normally different SP's and IdP's run each on a separate dns host causing the domain attribute to separate the cookies 
+#   the browser. However when running the SP's and IdP's within docker using docker compose we communicated with the
+#   different services using port mapping a localhost port to a service. This causes all cookies to get domain 'localhost'
+#   in the browser running on localhost. This causes the SP and IdP using both the same SimpleSAML cookie, and more of such conflicts.
+#   The easiest solution for runnnig in docker is to give each cookie an unique name.
+# 
+# IDP's SimpleSAML cookie 
+RUN sed -i "s|'session.phpsession.cookiename' => .*|'session.phpsession.cookiename' => 'SimpleSAML_IDP',|" /var/simplesamlphp/config/config.php
+# IDP's SimpleSAMLAuthToken cookie 
+RUN sed -i "s|'session.authtoken.cookiename' => .*|'session.authtoken.cookiename' => 'SimpleSAMLAuthToken_IDP',|" /var/simplesamlphp/config/config.php
+#
+# PmWiki using php's PHPSESSID cookie (see https://www.php.net/manual/en/session.configuration.php  session.name)
+RUN sed -i "s|session.name = PHPSESSID|session.name = PHPSESSID_IDP|" "$PHP_INI_DIR/php.ini"
+
+# # BUGFIX: see https://github.com/simplesamlphp/simplesamlphp/issues/1592
+# RUN sed -i "s|\$this->setupL10N();|\$this->setupL10N();\$this->setupTranslator();|" /var/simplesamlphp/lib/SimpleSAML/Locale/Localization.php
 
 
 # configure idp to use 'userpass' as authentication source in ipd: username/passwords in config file
@@ -234,6 +261,35 @@ $metadata['__DYNAMIC:1__'] = [
      */
     'privatekey' => 'idp.pem',
     'certificate' => 'idp.crt',
+
+    #'assertion.encryption' => TRUE,  // Outgoing assertions are encrypted if 'assertion.encryption' option is enabled(TRUE). 
+                                      // Requires certificate of each SP set in this IdP configuration otherwise you get :
+                                      // Exception: $metadata['https://.../simplesaml/module.php/saml/sp/metadata.php/default-sp']: 
+                                      //    Missing certificate in metadata.
+                                     
+    #'redirect.sign' => TRUE,         // Sign logout requests and logout responses sent to SP. (from this IdP)
+                                      // Signatures are only validated if on the SP site the option 'redirect.validate' is enabled,  
+                                      // else the signatures will just be ignored by the SP.
+
+    #'redirect.validate' => TRUE,     // Validate signature on incoming authentication requests, logout requests and logout responses 
+                                      // sent from this IdP (to an SP). 
+                                      // Requires signature added on SP site by enabling the 'redirect.sign' option on the SP,
+                                      // because otherwise you get error on idp: 
+                                      //     Validation of received messages enabled, but no signature found on message.
+    
+                                      
+    # OFFICIAL DOCS: from  https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted.html 
+    #                (or per sp https://simplesamlphp.org/docs/stable/simplesamlphp-reference-sp-remote)
+    #
+    #   assertion.encryption
+    #     Whether assertions sent from this IdP should be encrypted. The default value is FALSE .
+    #   redirect.sign
+    #     Whether logout requests and logout responses sent from this IdP should be signed. 
+    #     The default is FALSE .
+    #   redirect.validate
+    #     Whether authentication requests, logout requests and logout responses received sent 
+    #     from this IdP should be validated. The default is FALSE
+                          
 
     /*
      * The authentication source which should be used to authenticate the
@@ -267,6 +323,13 @@ $config = [
 
   'userpass' => [
     'exampleauth:UserPass',
+    
+    // doc: https://github.com/simplesamlphp/simplesamlphp/blob/master/config-templates/authsources.php
+    // Give the user an option to save their username for future login attempts
+    // And when enabled, what should the default be, to save the username or not
+    // 'remember.username.enabled' => false,  // default: false;  if true, keeps track of the user so that the username is pre-filled in the login box
+    // 'remember.username.checked' => false,  // default: false;  requires 'remember.username.enabled' set to true, otherwise checkbox not shown
+    
     'student:studentpass' => [
       'uid' => ['student'],
       'eduPersonAffiliation' => ['member', 'student'],
@@ -284,23 +347,35 @@ EOF
 #------------------
 
 # declare args in local phase to get default arg values set from top of Dockerfile
+ARG SP_PORTS="$SP_PORTS"
 ARG SIMPLESAMLPHP_SP_ENTITY_ID
 ARG SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE
 ARG SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE
 
 # Make persist in container as environment variables
+ENV SP_PORTS="$SP_PORTS" 
 ENV SIMPLESAMLPHP_SP_ENTITY_ID="$SIMPLESAMLPHP_SP_ENTITY_ID" 
 ENV SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE="$SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE" 
 ENV SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE="$SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE" 
 
 
-COPY <<'EOF' /var/simplesamlphp/metadata/saml20-sp-remote.php
-<?php
-$metadata[getenv('SIMPLESAMLPHP_SP_ENTITY_ID')] = array(
-    'AssertionConsumerService' => getenv('SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE'),
-    'SingleLogoutService' => getenv('SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE'),
+# create template for an sp
+COPY <<EOF /tmp/template_meta_sp.txt
+\$metadata['$SIMPLESAMLPHP_SP_ENTITY_ID'] = array(
+    'AssertionConsumerService' => '$SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE',
+    'SingleLogoutService' => '$SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE',
+
+    'certificate' => 'sp.crt',
 );
 EOF
+# fill template  with "evnsubst '$PORT'" which only replaces the PORT variable (leaving $metadata intact)
+RUN  echo '<?php' > /var/simplesamlphp/metadata/saml20-sp-remote.php &&\
+     for PORT in $SP_PORTS;\
+     do\
+       export PORT="$PORT";\
+       cat /tmp/template_meta_sp.txt | envsubst '$PORT' >> /var/simplesamlphp/metadata/saml20-sp-remote.php;\
+     done  
+        
 
 
 # ----------------------------------------------------------------

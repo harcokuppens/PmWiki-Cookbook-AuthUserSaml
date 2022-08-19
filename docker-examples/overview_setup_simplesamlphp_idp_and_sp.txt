@@ -205,7 +205,7 @@ SHORT setup SP:
                 
 SimpleSAMLphp Identity Provider QuickStart
 -------------------------------------------           
-src: https://simplesamlphp.org/docs/latest/simplesamlphp-idp.html    
+src: https://simplesamlphp.org/docs/stable/simplesamlphp-idp.html    
       or SimpleSAMLphp_Identity_Provider_QuickStart.pdf         
              
 configure Idp =>  config/config.php             
@@ -214,7 +214,8 @@ configure Idp =>  config/config.php
 
      'enable.saml20-idp' => true,
     
-  The exampleauth:UserPass authentication module is part of the exampleauth module. This module isn't enabled by default, so you will have to enable it in config.php 
+  The exampleauth:UserPass authentication module is part of the exampleauth module. This module isn't enabled by default, 
+  so you will have to enable it in config.php 
 
       'module.enable' => [
            'exampleauth' => true,

@@ -261,6 +261,31 @@ RUN sed -i "s|'saml' => false,|'saml' => true,|"  ${SIMPLESAMLPHP_DIR}/config/co
 RUN sed -i "s|'logging.handler' => 'syslog',|'logging.handler' => 'errorlog',|" ${SIMPLESAMLPHP_DIR}/config/config.php
 
 
+# Prevent cookie conflicts by giving cookies unique names
+#   Give cookies different name to prevent conflicts with SP in a docker compose run.
+#   Normally different SP's and IdP's run each on a separate dns host causing the domain attribute to separate the cookies 
+#   the browser. However when running the SP's and IdP's within docker using docker compose we communicated with the
+#   different services using port mapping a localhost port to a service. This causes all cookies to get domain 'localhost'
+#   in the browser running on localhost. This causes the SP and IdP using both the same SimpleSAML cookie, and more of such conflicts.
+#   The easiest solution for runnnig in docker is to give each cookie an unique name.
+# 
+# SP's SimpleSAML cookie 
+RUN sed -i "s|'session.phpsession.cookiename' => .*|'session.phpsession.cookiename' => 'SimpleSAML_SP',|" ${SIMPLESAMLPHP_DIR}/config/config.php
+# SP's SimpleSAMLAuthToken cookie 
+RUN sed -i "s|'session.authtoken.cookiename' => .*|'session.authtoken.cookiename' => 'SimpleSAMLAuthToken_SP',|" ${SIMPLESAMLPHP_DIR}/config/config.php
+#
+# PmWiki using php's PHPSESSID cookie (see https://www.php.net/manual/en/session.configuration.php  session.name)
+RUN sed -i "s|session.name = PHPSESSID|session.name = PHPSESSID_SP|" "$PHP_INI_DIR/php.ini"
+
+
+
+# # BUGFIX: see https://github.com/simplesamlphp/simplesamlphp/issues/1592
+# RUN sed -i "s|\$this->setupL10N();|\$this->setupL10N();\$this->setupTranslator();|" /var/www/html/pmwiki/cookbook/AuthUserSaml/simplesamlphp/./lib/SimpleSAML/Locale/Localization.php
+
+
+
+
+
 # declare args in local phase to get default arg values set from top of Dockerfile
 ARG SIMPLESAMLPHP_IDP_ENTITY_ID
 ARG SIMPLESAMLPHP_IDP_SINGLE_SIGNON_SERVICE

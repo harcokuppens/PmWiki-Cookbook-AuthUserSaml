@@ -1,5 +1,24 @@
 <?php if (!defined('PmWiki')) exit();
 
+$DEBUG=false;
+
+#-----------------------------------------------
+# helper for debugging
+#-----------------------------------------------
+
+
+# pretty print as html
+function pp(  $varname, $var ) {
+  #$var=$$varname;
+  ob_start();
+  print_r( $var);
+  $output = ob_get_contents();
+  ob_end_clean();
+  $output = htmlentities($output);
+  $output = preg_replace("/\n/","<br>",$output);
+  print "<pre>$varname: $output</pre>";
+}
+
 
 #-----------------------------------------------
 #   Use "Clean URLs"
@@ -9,6 +28,9 @@
 $EnablePathInfo = 1;
 $ScriptUrl = "https://localhost:9443";
 
+
+);
+
 #-----------------------------------------------
 #  authentication
 #-----------------------------------------------
@@ -16,6 +38,16 @@ $ScriptUrl = "https://localhost:9443";
 # Note: you can configure users and groups in SiteAdmin.AuthUser page,
 #       however in example below we do this in this config file using
 #       the $AuthUser array
+
+
+# PRE authentication
+#--------------------
+
+#print to browser _REQUEST and _SESSION before authentication
+if ( $DEBUG ) {
+   pp("_REQUEST",$_REQUEST);
+   pp("_SESSION",$_SESSION);    
+};
 
 # local authentication 
 # --------------------
@@ -52,6 +84,17 @@ $AuthUser['@admins'][] = 'student'; # user from saml identity provider
 #      * either checks if authentication with saml already succeeded
 #      * or does local authentication with local user/passwd file
 include_once("$FarmD/scripts/authuser.php");
+
+
+#  POST authentication
+#----------------------
+
+#print to browser _REQUEST and _SESSION after authentication
+if ( $DEBUG ) {
+   pp("_REQUEST",$_REQUEST);
+   pp("_SESSION",$_SESSION);    
+};
+
 
 # disable password-only authentication  (no username supplied)
 #-------------------------------------------------------------
