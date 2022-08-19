@@ -7,7 +7,7 @@ This directory contains 3 examples of an identity provider and a service provide
 
 * [Single SignOn(SSO)](https://en.wikipedia.org/wiki/Single_sign-on) : if you login to one PmWiki website with your credentials, you can directly login to the other PmWiki website without needing to supply your credentials again.
 * [Single Logout(SLO)](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/siteminder/12-7/configuring/partnership-federation/logging-out-of-user-sessions/single-logout-overview-saml-2-0.html): if you logout from one PmWiki website you are directly logged out from the other PmWiki website. 
-* SSO and SLO only work within the same browser and not between different browsers.
+* SSO and SLO only work within the **same browser** and not between different browsers.
 
 
 ### Short description examples 
@@ -29,7 +29,7 @@ We have a single SimpleSAMLphp identity provider in `idp/`, which can be used wi
         - with pmwiki account login does also redirect on login page
         - disable password-only authentication 
      
-     The advanced pmwiki installation setup with Docker is more advanced so that we easily can launch with `docker compose` multiple independent instances of the  advanced pmwiki website to demonstrate Single Login and Single Logout. 
+     The advanced pmwiki installation setup with Docker is more advanced so that we easily can launch with `docker compose` multiple independent instances of the  advanced pmwiki website to demonstrate **Single Login** and **Single Logout**. 
     
 The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Provider_QuickStart.pdf and the `sp/simple_php_website/Dockerfile` follows the instruction in SimpleSAMLphp_Service_Provider_QuickStart.pdf. The pmwiki based `Dockerfile`'s are based on that `Dockerfile`. Making the `Dockerfile` follow the original instructions makes it much clearer and more easy to adapt for newer versions.
 
