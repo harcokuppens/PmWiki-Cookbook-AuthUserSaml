@@ -28,7 +28,9 @@ We have a single SimpleSAMLphp identity provider in `idp/`, which can be used wi
      * more advanced config
         - with pmwiki account login does also redirect on login page
         - disable password-only authentication 
-
+     
+     The advanced pmwiki installation setup with Docker is more advanced so that we easily can launch with `docker compose` multiple independent instances of the  advanced pmwiki website to demonstrate Single Login and Single Logout. 
+    
 The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Provider_QuickStart.pdf and the `sp/simple_php_website/Dockerfile` follows the instruction in SimpleSAMLphp_Service_Provider_QuickStart.pdf. The pmwiki based `Dockerfile`'s are based on that `Dockerfile`. Making the `Dockerfile` follow the original instructions makes it much clearer and more easy to adapt for newer versions.
 
 ## `sp/simple_php_website`
@@ -120,3 +122,16 @@ Goto the `docker-examples/` folder, and run the example with
 then open browser on `https://localhost:9443/`
 
 The behavior for `sp/pmwiki.adv` is the same as for `sp/pmwiki.basic` except that nicer urls are shown for the wiki pages.
+
+Then open another browser window/tab on `https://localhost:7443/` which shows a another independent instance of the pmwiki website. Which you can easily see by editing a page in one instance which won't change in the other instance.
+
+Test Single Login:
+
+* login to the first website with your credentials
+* then logint the second website, and you will see you do NOT need to supply credentials anymore
+
+Test Single Logout:
+
+* login to both instances
+* then logout on one instance
+* then when you look at the other instance it seems that you are still logged in,  because an older state is shown before the logout. But when you browse to another page it will show you are indeed also logged out on this instance.
