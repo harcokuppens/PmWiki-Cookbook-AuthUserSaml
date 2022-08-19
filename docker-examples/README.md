@@ -2,7 +2,7 @@
   
 This directory contains 3 examples of an identity provider and a service provider setup using SimpleSAMLphp. Each example is run with docker compose to start both the identity provider and a service provider at once. One example demonstrates SAML with a simple php script, and the other two examples with pmwiki as service provider; once for a basic config, and the other with a more advanced config. Take a look at these examples to better understand how it all works. 
 
-## Docker examples
+## Overview
  The ```docker-examples/``` directory contains 3 examples of an identity provider and a service provider setup using SimpleSAMLphp. Each example is run with docker compose to start both the identity provider and a service provider at once. One example demonstrates SAML with a simple php script, and the other two examples with pmwiki as service provider; once for a basic config, and the other with a more advanced config. The advanced PmWiki example is also used to show [Single SignOn(SSO)](https://en.wikipedia.org/wiki/Single_sign-on) and [Single Logout(SLO)](https://techdocs.broadcom.com/us/en/symantec-security-software/identity-security/siteminder/12-7/configuring/partnership-federation/logging-out-of-user-sessions/single-logout-overview-saml-2-0.html) feature of SAML by using docker compose to start one instance of IDP and two separate instances of the PmWiki website:
 
 * [Single SignOn(SSO)](https://en.wikipedia.org/wiki/Single_sign-on) : if you login to one PmWiki website with your credentials, you can directly login to the other PmWiki website without needing to supply your credentials again.
@@ -35,8 +35,11 @@ The `idp/Dockerfile` follows the instructions in the SimpleSAMLphp_Identity_Prov
 
 The `Dockerfile`'s for the pmwiki examples are based on the `Dockerfile` of the `simple_php_website` example. The `Dockerfile` for the pmwiki example adds instructions for installing pmwiki and then installing the AuthUserSaml extension pmwiki.  Detailed instructions for installing the AuthUserSaml extension are at the PmWiki's [AuthUserSaml cookbook](https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml) page. 
 
+## Demonstrating the Docker SAML examples 
 
-## `sp/simple_php_website`
+Below we describe a quick demonstration of each example:
+
+### `sp/simple_php_website`
 
 Demonstrating a SimpleSAMLphp identity provider with a simple index.php script.
 
@@ -79,7 +82,7 @@ Note: instead of clicking on "Login" you can also click on the link 'simplesamlp
 * click on "default-sp" with link (https://localhost:9443/simplesaml/module.php/core/authenticate.php?as=default-sp) which redirects you to idp for authentication! (https://localhost:8443/simplesaml/saml2/idp/SSOService.php?SAMLRequest=....)
 * After logging in on the ipd you are redicted back to a pag in this example sp (https://localhost:9443/simplesaml/module.php/core/authenticate.php?as=default-sp) which shows your login details.
 
-## `sp/pmwiki.basic`
+### `sp/pmwiki.basic`
 
 Goto the `docker-examples/` folder, and run the example with
    
@@ -116,7 +119,7 @@ The authorization rules in the pmwiki config are set as such that only when logg
 Note: when logging out, you are logged out from pmwiki but not from the identity provider.
 So when logging in again you are immediately logged in because the identity provider says you are already logged in as `student`.
 
-## `sp/pmwiki.adv`
+### `sp/pmwiki.adv`
 
 Goto the `docker-examples/` folder, and run the example with
    
