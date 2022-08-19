@@ -312,8 +312,47 @@ COPY <<'EOF' ${SIMPLESAMLPHP_DIR}/config/authsources.php
      /* This is the name of this authentication source, and will be used to access it later. */
      'default-sp' => [
          'saml:SP',
-      #   'privatekey' => 'sp.pem',
-      #   'certificate' => 'sp.crt',
+
+         // from https://simplesamlphp.org/docs/stable/simplesamlphp-sp
+         //  If you enable a certificate for your Service Provider, 
+         //  it may be able to sign requests and response sent to the Identity Provider, 
+         //    ^^^^^^^^^^      ^^^^
+         //      `-> not directly done, must first be activated!    
+         //   as well as receiving encrypted responses.
+         //              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         
+         # see documentation at  https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml#config 
+         
+         #'privatekey' => 'sp.pem',       // Enabling a certificate for your Service Provider 
+         #'certificate' => 'sp.crt',      //  => allows you to receive encrypted assertions from IdP (not enforced).
+       
+         #'assertion.encryption' => TRUE,  // Incoming assertions MUST be encrypted. 
+                                           // If this option is set to TRUE , unencrypted assertions will be rejected.
+                                           // if FALSE it will handle unencrypted assertions, but it will also handle 
+                                           // encrypted assertions ONLY IF certificate if idp is configured which 
+                                           // is by default REQUIRED!!!
+         
+         #'redirect.sign' => TRUE,         // Sign authentication requests, logout requests and logout responses sent from this SP (to IdP)
+                                           // Signatures are only validated if on the IdP site the 'redirect.sign' 
+                                           // option is enabled otherwise the signatures will just be ignored by the IdP.
+         
+         # redirect.validate' => TRUE,     // Validate signature on logout requests and logout responses received by this SP (from IdP)
+                                           // Requires signature added on IdP site by enabling the 'redirect.sign' option on the Idp,
+                                           // because otherwise you get error on SP: 
+                                           //     Validation of received messages enabled, but no signature found on message.    
+         
+         # OFFICIAL DOCS: from https://simplesamlphp.org/docs/stable/saml/sp.html  (or per idp specific
+         #                https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-remote.html#)
+         #
+         # assertion.encryption
+         #    Whether assertions received by this SP must be encrypted. The default value is FALSE . 
+         #    If this option is set to TRUE , unencrypted assertions will be rejected.
+         # redirect.sign
+         #    Whether authentication requests, logout requests and logout responses sent from 
+         #    this SP should be signed. The default is FALSE .
+         # redirect.validate
+         #    Whether logout requests and logout responses received by this SP should be validated. 
+         #    The default is FALSE .
          
 
          /*

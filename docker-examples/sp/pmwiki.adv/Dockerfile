@@ -378,8 +378,11 @@ COPY <<'EOF' ${SIMPLESAMLPHP_DIR}/config/authsources.php
          //      `-> not directly done, must first be activated!    
          //   as well as receiving encrypted responses.
          //              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-         'privatekey' => 'sp.pem',
-         'certificate' => 'sp.crt',
+         
+         # see documentation at  https://www.pmwiki.org/wiki/Cookbook/AuthUserSaml#config 
+         
+         #'privatekey' => 'sp.pem',       // Enabling a certificate for your Service Provider 
+         #'certificate' => 'sp.crt',      //  => allows you to receive encrypted assertions from IdP (not enforced).
          
          #'assertion.encryption' => TRUE,  // Incoming assertions MUST be encrypted. 
                                            // If this option is set to TRUE , unencrypted assertions will be rejected.
