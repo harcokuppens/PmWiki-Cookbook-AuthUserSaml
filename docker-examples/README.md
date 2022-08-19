@@ -125,12 +125,12 @@ The behavior for `sp/pmwiki.adv` is the same as for `sp/pmwiki.basic` except tha
 
 Then open another browser window/tab on `https://localhost:7443/` which shows a another independent instance of the pmwiki website. Which you can easily see by editing a page in one instance which won't change in the other instance.
 
-Test Single Login:
+Test **Single Login**:
 
 * login to the first website with your credentials
 * then logint the second website, and you will see you do NOT need to supply credentials anymore
 
-Test Single Logout:
+Test **Single Logout**:
 
 * login to both instances
 * then logout on one instance
